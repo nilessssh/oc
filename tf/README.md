@@ -5,3 +5,7 @@
 ### Requirnment
 Terraform 1.1.3
 
+### How to execute 
+~ cd instances  
+~ terraform plan -out plan  
+~ terraform plan apply
