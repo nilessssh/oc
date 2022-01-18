@@ -1,0 +1,49 @@
+---
+- hosts: all
+  gather_facts: no
+  become: true
+  become_user: root
+  tasks:
+    - name: Copy bashrc with correct ownership and permission for admin user 
+      copy:
+        src: /etc/skel/.bashrc
+        dest: /home/admin/
+        owner: admin
+        group: admin
+        mode: 0600
+
+    - name: Check if .ssh exists for admin
+      stat:
+        path: /home/admin/.ssh
+      register: ssh_dir
+
+    - name: Create .ssh if does not exists
+      file:
+        path: /home/admin/.ssh
+        state: directory
+        owner: admin
+        group: admin
+        mode: 0700
+      when: ssh_dir.stat.exists == false
+
+    - name: Check if authorized_keys exists for admin
+      stat:
+        path: /home/admin/.ssh/authorized_keys
+      register: auth_file
+
+    - name: Create authorized_keys if does not exists
+      file:
+        path: /home/admin/.ssh/authorized_keys
+        state: touch
+        owner: admin
+        group: admin
+        mode: 0400
+      when: auth_file.stat.exists == false
+
+    - name: Update authorized_keys file for Admin
+      lineinfile:
+        path: '/home/admin/.ssh/authorized_keys'
+        line: 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQ'
+        owner: admin
+        group: admin
+        mode:  0400
